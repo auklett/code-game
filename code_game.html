@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Game</title>
+    <style>
+        /* Base Colors */
+        :root {
+            --bg-dark: #1a1a1a;
+            --border-dark: #444;
+            --text-light: #e0e0e0;
+            --green-col: #0a6640;
+            --yellow-col: #8b6d00;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center; 
+            min-height: 100vh;
+            margin: 0;
+            background-color: var(--bg-dark);
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-light);
+        }
+
+        .interface-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* --- Default: Side-by-Side Layout --- */
+        .game-interface {
+            display: flex; 
+            gap: 60px;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 750px; 
+        }
+        
+        .table-area {
+            flex-grow: 1; 
+            max-width: 450px; 
+        }
+
+        /* Numpad Container (Fixed size) */
+        .numpad-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 36px;
+            width: 200px;
+            height: 300px; 
+            flex-shrink: 0;
+        }
+        
+        /* ------------------------------------ */
+        /* --- TABLE STYLING --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            border-width: 0; 
+        }
+        table, th, td { border: none; }
+        table tbody td { border: 1px solid var(--border-dark); }
+        th, td { padding: 0; text-align: center; font-size: 1.1em; color: var(--text-light); }
+        thead { background-color: transparent !important; border: none !important; }
+        th {
+            background-color: transparent; border: none; font-size: 1.5em; 
+            font-weight: normal; padding: 5px 0 10px 0;
+        }
+        table thead th:nth-child(1) { background-color: var(--green-col); }
+        table thead th:nth-child(6) { background-color: var(--yellow-col); }
+        
+        /* Data Cells (Squares) */
+        td { padding-bottom: 16.66%; height: 0; position: relative; background-color: var(--bg-dark); }
+        table tbody tr td:nth-child(1), table tbody tr td:nth-child(6) { background-color: var(--bg-dark); border: none; }
+        table tbody td:nth-child(2), table tbody td:nth-child(3), table tbody td:nth-child(4), table tbody td:nth-child(5) {
+            background-color: var(--bg-dark); border: 1px solid var(--border-dark);
+        }
+        td > div {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.5em;
+        }
+
+        /* --- NUMPAD BUTTON STYLING --- */
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
+        .numpad button {
+            width: 100%; height: 0; padding-bottom: 100%; position: relative;
+            font-weight: bold; color: var(--text-light); background-color: #4a4a4a;
+            border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .numpad button span {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center; font-size: 1.5em;
+        }
+        .numpad button.enter-button span { font-size: 1em; line-height: 1; }
+        .numpad button:hover { background-color: #5a5a5a; }
+        .numpad button.action-button { background-color: #005f73; }
+        .numpad button.enter-button { background-color: var(--green-col); }
+
+        #output-area { font-size: 1.2em; color: #76c7c0; margin-top: 10px; text-align: center; width: 100%; }
+        #secret-code-display { font-size: 1.2em; color: #f0f0f0; margin-top: 5px; text-align: center; width: 100%; }
+        
+        /* ------------------------------------ */
+        /* ⭐ MEDIA QUERY FOR NARROW SCREENS ⭐ */
+        @media (max-width: 700px) {
+            .game-interface {
+                flex-direction: column; 
+                align-items: center;
+                gap: 40px; 
+            }
+
+            .table-area {
+                max-width: 100%; 
+                width: 350px; 
+                order: 0;
+            }
+
+            .numpad-container {
+                margin-top: 0; 
+                width: 250px; 
+                height: auto;
+                order: 1;
+            }
+            
+            .numpad {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="interface-wrapper">
+        <div class="game-interface">
+            <div class="table-area">
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th><th>C</th><th>O</th><th>D</th><th>E</th><th></th> 
+                        </tr>
+                    </thead>
+                    <tbody id="game-body">
+                        <tr>
+                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                        </tr>
+                        <tr>
+                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="numpad-container">
+                <div class="numpad">
+                    <button class="numpad-button" data-value="1"><span>1</span></button>
+                    <button class="numpad-button" data-value="2"><span>2</span></button>
+                    <button class="numpad-button" data-value="3"><span>3</span></button>
+                    <button class="numpad-button" data-value="4"><span>4</span></button>
+                    <button class="numpad-button" data-value="5"><span>5</span></button>
+                    <button class="numpad-button" data-value="6"><span>6</span></button>
+                    <button class="numpad-button" data-value="7"><span>7</span></button>
+                    <button class="numpad-button" data-value="8"><span>8</span></button>
+                    <button class="numpad-button" data-value="9"><span>9</span></button>
+                    <button class="numpad-button action-button" data-value="backspace"><span>&#x2190;</span></button>
+                    <button class="numpad-button" data-value="0"><span>0</span></button>
+                    <button class="numpad-button enter-button" data-value="enter"><span>ENTER</span></button>
+                </div>
+                
+                <div id="output-area"></div>
+                <div id="secret-code-display"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const numpadButtons = document.querySelectorAll('.numpad-button');
+            const outputDiv = document.getElementById('output-area');
+            const codeDisplay = document.getElementById('secret-code-display');
+            const gameBody = document.getElementById('game-body');
+            const rows = gameBody.querySelectorAll('tr');
+            
+            let secretCode = generateCode();
+            let currentRowIndex = 0;
+            let currentColumnIndex = 0;
+            let isGameOver = false;
+
+            // --- Core Game Functions ---
+
+            /**
+             * Generates a 4-digit code with no repeating digits (0-9).
+             * @returns {string[]} The unique 4-digit secret code.
+             */
+            function generateCode() {
+                // 1. Create an array of digits [0, 1, 2, ..., 9]
+                let digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+                // 2. Shuffle the array (Fisher-Yates (Knuth) shuffle)
+                for (let i = digits.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [digits[i], digits[j]] = [digits[j], digits[i]];
+                }
+
+                // 3. Take the first four digits
+                return digits.slice(0, 4);
+            }
+
+            function getCurrentInputCell() {
+                if (currentRowIndex >= rows.length) return null;
+                return rows[currentRowIndex].cells[currentColumnIndex + 1];
+            }
+            
+            function getCurrentRowCells() {
+                return Array.from(rows[currentRowIndex].cells).slice(1, 5);
+            }
+
+            function inputDigit(digit) {
+                if (isGameOver) return;
+
+                if (currentColumnIndex < 4) {
+                    const cell = getCurrentInputCell();
+                    if (cell) {
+                        cell.querySelector('div').textContent = digit;
+                        currentColumnIndex++;
+                    }
+                }
+            }
+
+            function backspace() {
+                if (isGameOver) return;
+
+                if (currentColumnIndex > 0) {
+                    currentColumnIndex--;
+                    const cell = getCurrentInputCell();
+                    if (cell) {
+                        cell.querySelector('div').textContent = '';
+                    }
+                }
+            }
+
+            function checkGuess() {
+                if (isGameOver) return; 
+                
+                const guessCells = getCurrentRowCells();
+                const guess = guessCells.map(cell => cell.querySelector('div').textContent);
+                
+                if (guess.some(g => g === '')) {
+                    outputDiv.textContent = "Please complete the four-digit guess.";
+                    return;
+                }
+                outputDiv.textContent = "";
+                
+                let correctPosition = 0;
+                let correctDigit = 0;
+                
+                // Scoring logic (Mastermind rules for code/peg comparisons)
+                let code_temp = [...secretCode];
+                let guess_temp = [...guess];
+
+                // 1. Correct Position (Green Pegs - Col 1)
+                for (let i = 0; i < 4; i++) {
+                    if (guess[i] === secretCode[i]) {
+                        correctPosition++;
+                        code_temp[i] = null;
+                        guess_temp[i] = null;
+                    }
+                }
+                
+                // 2. Correct Digit, Wrong Position (Yellow Pegs - Col 6)
+                for (let i = 0; i < 4; i++) {
+                    if (guess_temp[i] !== null) {
+                        const codeIndex = code_temp.indexOf(guess_temp[i]);
+                        if (codeIndex !== -1) {
+                            correctDigit++;
+                            code_temp[codeIndex] = null;
+                        }
+                    }
+                }
+                
+                // --- Display Scores ---
+                rows[currentRowIndex].cells[0].querySelector('div').textContent = correctPosition;
+                rows[currentRowIndex].cells[5].querySelector('div').textContent = correctPosition + correctDigit;
+
+                // --- Advance Game State ---
+                if (correctPosition === 4) {
+                    outputDiv.textContent = "🎉 Code Cracked! You win!";
+                    codeDisplay.textContent = `Secret Code: ${secretCode.join('')}`;
+                    isGameOver = true;
+                } else {
+                    currentRowIndex++;
+                    currentColumnIndex = 0;
+                    
+                    if (currentRowIndex >= rows.length) {
+                         outputDiv.textContent = `Game Over! You ran out of rows.`;
+                         codeDisplay.textContent = `The code was ${secretCode.join('')}.`;
+                         isGameOver = true;
+                    }
+                }
+            }
+
+
+            // --- Event Listener ---
+            numpadButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    if (isGameOver) return;
+                    
+                    const value = button.getAttribute('data-value');
+
+                    if (value >= '0' && value <= '9') {
+                        inputDigit(value);
+                    } else if (value === 'backspace') {
+                        backspace();
+                    } else if (value === 'enter') {
+                        checkGuess();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
