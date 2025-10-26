@@ -10,8 +10,9 @@
             --bg-dark: #1a1a1a;
             --border-dark: #444;
             --text-light: #e0e0e0;
-            --green-col: #0a6640;
-            --yellow-col: #8b6d00;
+            --green-col: #0a6640; /* Correct digit & position */
+            --yellow-col: #8b6d00; /* Correct digit, wrong position */
+            --default-cell-bg: #1a1a1a; /* Background for input cells */
         }
 
         body {
@@ -68,28 +69,38 @@
             table-layout: fixed;
             border-width: 0; 
         }
+        /* No outer table border */
         table, th, td { border: none; }
-        table tbody td { border: 1px solid var(--border-dark); }
+        /* Inner borders for input cells only */
+        table tbody td:nth-child(n+1):nth-child(-n+4) { border: 1px solid var(--border-dark); } 
+
         th, td { padding: 0; text-align: center; font-size: 1.1em; color: var(--text-light); }
         thead { background-color: transparent !important; border: none !important; }
         th {
             background-color: transparent; border: none; font-size: 1.5em; 
             font-weight: normal; padding: 5px 0 10px 0;
         }
-        table thead th:nth-child(1) { background-color: var(--green-col); }
-        table thead th:nth-child(6) { background-color: var(--yellow-col); }
+        /* Headers for C, O, D, E */
+        table thead th:nth-child(1), table thead th:nth-child(2), table thead th:nth-child(3), table thead th:nth-child(4) {
+            background-color: transparent; /* No special header colors now */
+        }
         
         /* Data Cells (Squares) */
-        td { padding-bottom: 16.66%; height: 0; position: relative; background-color: var(--bg-dark); }
-        table tbody tr td:nth-child(1), table tbody tr td:nth-child(6) { background-color: var(--bg-dark); border: none; }
-        table tbody td:nth-child(2), table tbody td:nth-child(3), table tbody td:nth-child(4), table tbody td:nth-child(5) {
-            background-color: var(--bg-dark); border: 1px solid var(--border-dark);
-        }
+        td { padding-bottom: 25%; /* Changed from 16.66% as there are now 4 visible columns */
+             height: 0; position: relative; background-color: var(--default-cell-bg); }
+
+        /* No special handling for 'invisible' score columns as they are removed */
+        
         td > div {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; justify-content: center; align-items: center;
             font-size: 1.5em;
         }
+
+        /* Styling for the in-place score indication */
+        td > div.green { background-color: var(--green-col); }
+        td > div.yellow { background-color: var(--yellow-col); }
+
 
         /* --- NUMPAD BUTTON STYLING --- */
         .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
@@ -146,30 +157,30 @@
                 <table>
                     <thead>
                         <tr>
-                            <th></th><th>C</th><th>O</th><th>D</th><th>E</th><th></th> 
+                            <th>C</th><th>O</th><th>D</th><th>E</th>
                         </tr>
                     </thead>
                     <tbody id="game-body">
                         <tr>
-                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                            <td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td>
                         </tr>
                         <tr>
-                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                            <td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td>
                         </tr>
                         <tr>
-                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                            <td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td>
                         </tr>
                         <tr>
-                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                            <td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td>
                         </tr>
                         <tr>
-                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                            <td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td>
                         </tr>
                         <tr>
-                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                            <td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td>
                         </tr>
                         <tr>
-                            <td><div class="peg-correct"></div></td><td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td><td><div class="peg-total"></div></td>
+                            <td><div data-col="1"></div></td><td><div data-col="2"></div></td><td><div data-col="3"></div></td><td><div data-col="4"></div></td>
                         </tr>
                     </tbody>
                 </table>
@@ -217,35 +228,34 @@
              * @returns {string[]} The unique 4-digit secret code.
              */
             function generateCode() {
-                // 1. Create an array of digits [0, 1, 2, ..., 9]
                 let digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
-                // 2. Shuffle the array (Fisher-Yates (Knuth) shuffle)
                 for (let i = digits.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [digits[i], digits[j]] = [digits[j], digits[i]];
                 }
-
-                // 3. Take the first four digits
                 return digits.slice(0, 4);
             }
 
-            function getCurrentInputCell() {
+            function getCurrentInputCellContainer(colIndex) {
                 if (currentRowIndex >= rows.length) return null;
-                return rows[currentRowIndex].cells[currentColumnIndex + 1];
+                // Since Col 1 and Col 6 (scoring) are removed, the input cells are directly 0-3
+                return rows[currentRowIndex].cells[colIndex];
             }
             
-            function getCurrentRowCells() {
-                return Array.from(rows[currentRowIndex].cells).slice(1, 5);
+            function getCurrentRowDivs() {
+                // Returns the <div> elements within the four input cells of the current row
+                const rowCells = rows[currentRowIndex].querySelectorAll('td > div');
+                return Array.from(rowCells);
             }
 
             function inputDigit(digit) {
                 if (isGameOver) return;
 
                 if (currentColumnIndex < 4) {
-                    const cell = getCurrentInputCell();
-                    if (cell) {
-                        cell.querySelector('div').textContent = digit;
+                    const cellDiv = getCurrentInputCellContainer(currentColumnIndex).querySelector('div');
+                    if (cellDiv) {
+                        cellDiv.textContent = digit;
                         currentColumnIndex++;
                     }
                 }
@@ -256,9 +266,11 @@
 
                 if (currentColumnIndex > 0) {
                     currentColumnIndex--;
-                    const cell = getCurrentInputCell();
-                    if (cell) {
-                        cell.querySelector('div').textContent = '';
+                    const cellDiv = getCurrentInputCellContainer(currentColumnIndex).querySelector('div');
+                    if (cellDiv) {
+                        cellDiv.textContent = '';
+                        // Also remove any color class if backspacing
+                        cellDiv.classList.remove('green', 'yellow');
                     }
                 }
             }
@@ -266,48 +278,53 @@
             function checkGuess() {
                 if (isGameOver) return; 
                 
-                const guessCells = getCurrentRowCells();
-                const guess = guessCells.map(cell => cell.querySelector('div').textContent);
+                const guessDivs = getCurrentRowDivs();
+                const guess = guessDivs.map(div => div.textContent);
                 
                 if (guess.some(g => g === '')) {
                     outputDiv.textContent = "Please complete the four-digit guess.";
                     return;
                 }
-                outputDiv.textContent = "";
+                outputDiv.textContent = ""; // Clear previous message
                 
-                let correctPosition = 0;
-                let correctDigit = 0;
+                let correctPositionCount = 0;
                 
-                // Scoring logic (Mastermind rules for code/peg comparisons)
+                // For scoring logic, use copies of the secret code and guess
                 let code_temp = [...secretCode];
                 let guess_temp = [...guess];
+                let scored_indices = new Set(); // To prevent double-counting of digits
 
-                // 1. Correct Position (Green Pegs - Col 1)
+                // Reset colors before applying new ones
+                guessDivs.forEach(div => div.classList.remove('green', 'yellow'));
+
+                // 1. Mark Correct Position (Green)
                 for (let i = 0; i < 4; i++) {
                     if (guess[i] === secretCode[i]) {
-                        correctPosition++;
-                        code_temp[i] = null;
-                        guess_temp[i] = null;
+                        guessDivs[i].classList.add('green');
+                        correctPositionCount++;
+                        code_temp[i] = null; // Mark as used in code
+                        guess_temp[i] = null; // Mark as used in guess
+                        scored_indices.add(i); // Mark the index of the div as scored
                     }
                 }
                 
-                // 2. Correct Digit, Wrong Position (Yellow Pegs - Col 6)
+                // 2. Mark Correct Digit, Wrong Position (Yellow)
                 for (let i = 0; i < 4; i++) {
-                    if (guess_temp[i] !== null) {
+                    if (guess_temp[i] !== null) { // If this guess digit hasn't been used for a 'green' match
                         const codeIndex = code_temp.indexOf(guess_temp[i]);
-                        if (codeIndex !== -1) {
-                            correctDigit++;
-                            code_temp[codeIndex] = null;
+                        if (codeIndex !== -1) { // If the digit exists in the remaining secret code
+                            if (!scored_indices.has(i)) { // Ensure this specific guess div hasn't already been colored green
+                                guessDivs[i].classList.add('yellow');
+                            }
+                            code_temp[codeIndex] = null; // Mark as used in code
+                            // No need to mark guess_temp[i] as null here for the div coloring logic,
+                            // as we only color the first instance for a 'yellow' match that isn't green.
                         }
                     }
                 }
                 
-                // --- Display Scores ---
-                rows[currentRowIndex].cells[0].querySelector('div').textContent = correctPosition;
-                rows[currentRowIndex].cells[5].querySelector('div').textContent = correctPosition + correctDigit;
-
                 // --- Advance Game State ---
-                if (correctPosition === 4) {
+                if (correctPositionCount === 4) {
                     outputDiv.textContent = "🎉 Code Cracked! You win!";
                     codeDisplay.textContent = `Secret Code: ${secretCode.join('')}`;
                     isGameOver = true;
